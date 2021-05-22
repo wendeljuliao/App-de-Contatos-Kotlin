@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.example.contatos.model.Task
 import com.example.contatos.model.User
 
-@Database(entities = [User::class, Task::class], version = 5)
+@Database(entities = [User::class, Task::class], version = 7)
 abstract class ContatosDatabase: RoomDatabase() {
 
     abstract fun getUserDAO(): UserDAO

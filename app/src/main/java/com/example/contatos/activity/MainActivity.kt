@@ -20,20 +20,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val db = DatabaseUtil.getInstance(this)
-        val userDAO = db.getUserDAO()
-
-        val user = User(firstName = "Bruno", lastName = "Alex", email="aalex@hotmail.com", password= "99999-9999")
-        val user2 = User(firstName = "Bruno2", lastName = "Alex2", email="aalex2@hotmail.com", password= "99999-9999")
-
-        val task = Task(name = "Lavar", description = "Lavar", isDone = false, userId = 1)
-        val task2 = Task(name = "Lavar2", description = "Lavar2", isDone = true, userId = 1)
-        val task3 = Task(name = "Lavar3", description = "Lavar3", isDone = true, userId = 2)
 
         GlobalScope.launch {
+            val userDAO = db.getUserDAO()
+            val taskDAO = db.getTaskDAO()
+
+            val user = User(firstName = "Bruno", lastName = "Alex", email="aalex@hotmail.com", password= "99999-9999")
+            val user2 = User(firstName = "Bruno2", lastName = "Alex2", email="aalex2@hotmail.com", password= "99999-9999")
+
+            val task = Task(name = "Lavar", description = "Lavar", isDone = false, userId = 1)
+            val task2 = Task(name = "Lavar2", description = "Lavar2", isDone = true, userId = 1)
+            val task3 = Task(name = "Lavar3", description = "Lavar3", isDone = true, userId = 2)
+
             userDAO.insert(user)
             userDAO.insert(user2)
 
-            val taskDAO = db.getTaskDAO()
             taskDAO.insert(task)
             taskDAO.insert(task2)
             taskDAO.insert(task3)
