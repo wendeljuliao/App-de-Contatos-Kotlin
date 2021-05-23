@@ -2,10 +2,13 @@ package com.example.contatos.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.example.contatos.R
 import com.example.contatos.dao.UserDAO
 import com.example.contatos.model.User
@@ -85,17 +88,32 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
                     GlobalScope.launch {
-                        val user = User(
-                            firstName = firstName,
-                            lastName = lastName,
-                            email = email,
-                            password = password
-                        )
 
-                        userDAO.insert(user)
+                        val handler = Handler(Looper.getMainLooper())
 
-                        Toast.makeText(applicationContext, "O usuário ${firstName} foi cadastrado com sucesso!", Toast.LENGTH_LONG).show()
-                        finish()
+                        val user = userDAO.findByEmail(email)
+
+                        if (user == null) {
+                            val newUser = User(
+                                firstName = firstName,
+                                lastName = lastName,
+                                email = email,
+                                password = BCrypt.withDefaults().hashToString(12, password.toCharArray())
+                            )
+
+                            userDAO.insert(newUser)
+
+                            handler.post{
+                                Toast.makeText(applicationContext, "O usuário ${firstName} foi cadastrado com sucesso!", Toast.LENGTH_LONG).show()
+                                finish()
+                            }
+                        } else {
+                            handler.post{
+                                mRegisterEmail.error = "Já existe um usuário com este email."
+
+                            }
+                        }
+
                     }
 
                 }
@@ -105,4 +123,7 @@ class RegisterActivity : AppCompatActivity(), View.OnClickListener {
 
         }
     }
+
+
+
 }
