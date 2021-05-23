@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Contatos</string>
+    <string name="form_is_required_error">Este campo deve ser preenchido</string>
 </resources>

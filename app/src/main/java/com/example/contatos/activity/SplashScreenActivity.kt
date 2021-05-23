@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import com.example.contatos.R
+import com.example.contatos.util.DatabaseUtil
 
 class SplashScreenActivity : AppCompatActivity() {
 
@@ -14,6 +15,8 @@ class SplashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
+
+        DatabaseUtil.getInstance(this)
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
