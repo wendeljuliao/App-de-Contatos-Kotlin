@@ -11,9 +11,11 @@ import com.example.contatos.model.Task
 
 class TaskAdapter(val tasks:List<Task>):RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
+    private var listener: TaskItemListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false)
-        return TaskViewHolder(itemView)
+        return TaskViewHolder(itemView, listener)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
@@ -32,12 +34,26 @@ class TaskAdapter(val tasks:List<Task>):RecyclerView.Adapter<TaskAdapter.TaskVie
         return tasks.size
     }
 
-    class TaskViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    fun setTaskItemListener(listener: TaskItemListener) {
+        this.listener = listener
+    }
+
+    class TaskViewHolder(itemView: View, listener: TaskItemListener?): RecyclerView.ViewHolder(itemView) {
 
         val name: TextView = itemView.findViewById(R.id.item_task_textview_name)
         val description: TextView = itemView.findViewById(R.id.item_task_textview_description)
         val isDone: View = itemView.findViewById(R.id.item_task_view_isdone)
 
+        init {
+            itemView.setOnClickListener {
+                listener?.onTaskItemClick(it, adapterPosition)
+            }
+
+            itemView.setOnLongClickListener {
+                listener?.onTaskItemClick(it, adapterPosition)
+                true
+            }
+        }
 
     }
 
