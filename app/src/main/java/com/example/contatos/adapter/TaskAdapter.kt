@@ -36,7 +36,7 @@ class TaskAdapter(val tasks:List<Task>):RecyclerView.Adapter<TaskAdapter.TaskVie
 
         val name: TextView = itemView.findViewById(R.id.item_task_textview_name)
         val description: TextView = itemView.findViewById(R.id.item_task_textview_description)
-        val isDone: View = itemView.findViewById(R.id.item_task_view_isfinished)
+        val isDone: View = itemView.findViewById(R.id.item_task_view_isdone)
 
 
     }
