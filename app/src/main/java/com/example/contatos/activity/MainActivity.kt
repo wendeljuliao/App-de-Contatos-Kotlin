@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
@@ -29,13 +30,16 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, TaskItemListener {
 
-    private lateinit var userDAO: UserDAO
+    private lateinit var mUserDAO: UserDAO
+    private lateinit var mTaskDAO: TaskDAO
     private lateinit var mTaskList: RecyclerView
     private lateinit var mAddTask: FloatingActionButton
 
     private lateinit var mUserWithTasks: UserWithTasks
+    private lateinit var taskAdapter: TaskAdapter
 
     private val handler = Handler(Looper.getMainLooper())
+    private val mTaskListAux = mutableListOf<Task>()
 
     private var mUserId = -1
 
@@ -43,7 +47,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TaskItemListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        userDAO = DatabaseUtil.getInstance(applicationContext).getUserDAO()
+        mUserDAO = DatabaseUtil.getInstance(applicationContext).getUserDAO()
+        mTaskDAO = DatabaseUtil.getInstance(applicationContext).getTaskDAO()
+
         mTaskList = findViewById(R.id.main_recyclerview_tasks)
         mAddTask = findViewById(R.id.main_floatingbutton_add_task)
         mAddTask.setOnClickListener(this)
@@ -62,8 +68,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TaskItemListener
         super.onStart()
         GlobalScope.launch {
             if (mUserId != -1) {
-                mUserWithTasks = userDAO.findTasksByUser(mUserId)
-                val taskAdapter = TaskAdapter(mUserWithTasks.tasks)
+                mUserWithTasks = mUserDAO.findTasksByUser(mUserId)
+
+                mTaskListAux.clear()
+                mTaskListAux.addAll(mUserWithTasks.tasks)
+                taskAdapter = TaskAdapter(mTaskListAux)
                 taskAdapter.setTaskItemListener(this@MainActivity)
                 val llm = LinearLayoutManager(applicationContext)
 
@@ -97,6 +106,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, TaskItemListener
     }
 
     override fun onTaskItemLongClick(v: View, pos: Int) {
-        Toast.makeText(applicationContext, "Long Click", Toast.LENGTH_SHORT).show()
+
+        val task = mUserWithTasks.tasks[pos]
+
+        val alert = AlertDialog.Builder(this)
+            .setTitle("To Do List")
+            .setMessage("Você deseja excluir a tarefa ${task.name}?")
+            .setPositiveButton("Sim") {dialog, _ ->
+                dialog.dismiss()
+
+                GlobalScope.launch {
+                    mTaskDAO.delete(task)
+                    mUserWithTasks = mUserDAO.findTasksByUser(mUserId)
+
+                    mTaskListAux.removeAt(pos)
+                    handler.post {
+                        taskAdapter.notifyItemRemoved(pos)
+                    }
+
+                }
+
+            }
+            .setNegativeButton("Não") {dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .create()
+
+        alert.show()
     }
 }
