@@ -50,7 +50,7 @@ class TaskAdapter(val tasks:List<Task>):RecyclerView.Adapter<TaskAdapter.TaskVie
             }
 
             itemView.setOnLongClickListener {
-                listener?.onTaskItemClick(it, adapterPosition)
+                listener?.onTaskItemLongClick(it, adapterPosition)
                 true
             }
         }
